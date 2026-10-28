@@ -1,0 +1,1 @@
+{"name":"mono-workspace","version":"1.0.0","private":true,"scripts":{"dev":"python3 -m http.server 4175 --directory dist","build":"node --check dist/app.js"}}
