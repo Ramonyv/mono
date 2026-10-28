@@ -23,3 +23,10 @@ svg[aria-hidden="true"],svg[aria-hidden="true"] :is(path,circle,rect,line,polyli
   stroke-width:var(--icon-stroke);
   vector-effect:non-scaling-stroke;
 }
+
+/* A highlighted row is one rounded surface, without adjoining dividers. */
+.data-table{border-collapse:separate;border-spacing:0}
+.data-table tbody>tr:is(:hover,.selected)>td{border-top-color:transparent}
+.data-table tbody>tr:is(:hover,.selected)+tr>td{border-top-color:transparent}
+.data-table tbody>tr:is(:hover,.selected)>td:first-child{border-radius:12px 0 0 12px}
+.data-table tbody>tr:is(:hover,.selected)>td:last-child{border-radius:0 12px 12px 0}
