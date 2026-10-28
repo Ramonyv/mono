@@ -1,0 +1,6 @@
+/* File bytes live in IndexedDB; workspace records contain only metadata. */
+window.MonoFiles={
+  async open(){if(!this.promise)this.promise=new Promise((resolve,reject)=>{const req=indexedDB.open('mono-files',1);req.onupgradeneeded=()=>req.result.createObjectStore('files');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});return this.promise},
+  async put(file){const db=await this.open(),id=crypto.randomUUID();await new Promise((resolve,reject)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put(file,id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});return{id,mime:file.type,name:file.name,size:(file.size/1024/1024).toFixed(1)+' MB',kind:file.name.toLowerCase().endsWith('.pdf')?'PDF':'File',url:URL.createObjectURL(file),date:new Date().toISOString().slice(0,10)}},
+  async url(file){if(file.url?.startsWith('data:'))return file.url;if(!file.id)return null;this.cache??=new Map();if(this.cache.has(file.id))return this.cache.get(file.id);const db=await this.open();const blob=await new Promise((resolve,reject)=>{const req=db.transaction('files').objectStore('files').get(file.id);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});if(!blob)return null;const url=URL.createObjectURL(blob);this.cache.set(file.id,url);return url}
+};
