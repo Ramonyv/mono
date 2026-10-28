@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 const errors=[];
 const dom=new JSDOM('<!doctype html><html><body><div id="app"></div></body></html>',{url:'http://localhost:4175',runScripts:'dangerously',pretendToBeVisual:true});
 const w=dom.window;w.structuredClone=structuredClone;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.addEventListener('error',e=>errors.push(e.error));
-for(const file of ['icons.js','app.js','product.js'])vm.runInContext(fs.readFileSync('dist/'+file,'utf8'),dom.getInternalVMContext(),{filename:file});
+for(const file of ['icons.js','app.js','product.js','controls.js'])vm.runInContext(fs.readFileSync('dist/'+file,'utf8'),dom.getInternalVMContext(),{filename:file});
 const run=s=>vm.runInContext(s,dom.getInternalVMContext());
 assert.match(w.document.body.textContent,/Good morning/);
 for(const page of ['Projects','Clients','Tasks','Calendar','Invoices','Expenses','Budget','Investments','Notes','Meetings']){
@@ -28,4 +28,5 @@ run("navigate('Projects')");w.document.querySelector('.header-actions .primary')
 run("navigate('Expenses');startEditor('Expenses')");const title=w.document.querySelector('[name=title]');title.value='Saved expense';title.dispatchEvent(new w.Event('input',{bubbles:true}));const amount=w.document.querySelector('[name=amount]');amount.value='1250';amount.dispatchEvent(new w.Event('input',{bubbles:true}));assert.ok(w.document.querySelector('.expense-preview').textContent.includes('1,250'));run("editorState.record.client='Pixel Studio';editorState.record.project='Website Redesign'");w.document.querySelector('.editor-preview button[type=submit]').click();assert.ok(run("db().expenses.some(e=>e.title==='Saved expense')"),'Expense preview footer submits form');
 assert.equal(errors.length,0,errors.map(e=>e?.stack).join('\n'));
 console.log('PASS: screen rendering, forms, filtering, task state, invoice calculation, persistence, and workspace isolation');
-run('buttonObserver.disconnect()');dom.window.close();
+run("startEditor('Meetings');enhanceTemporalFields()");assert.equal(w.document.querySelectorAll('input[type=date]').length,w.document.querySelectorAll('.temporal-date').length,'All date fields have Hugeicons controls');const timeButton=w.document.querySelector('.temporal-time .temporal-trigger');timeButton.click();assert.ok(w.document.querySelector('.temporal-popover [data-icon=clock]'),'Time picker uses Hugeicons');run('closeTemporalPicker()');w.document.querySelector('.temporal-date .temporal-trigger').click();const dateButton=w.document.querySelector('.temporal-popover [data-date="2025-04-22"]');dateButton.click();assert.equal(run('editorState.record.date'),'2025-04-22','Custom calendar updates record');assert.ok(!w.document.querySelector('.temporal-popover'),'Calendar closes after choice');
+run('temporalObserver.disconnect();buttonObserver.disconnect()');dom.window.close();

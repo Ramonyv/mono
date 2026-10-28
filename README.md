@@ -24,6 +24,7 @@ The deployable application is in `dist/`. No external font or icon CDN is requir
 - Notes with rich text formatting, tags, attachments and live preview.
 - Meetings with participants, agendas, links, reminders, attachments and live preview.
 - Quick Add, workspace-wide search and time tracking.
+- Shared date/time/month pickers, checkmarks and interface controls use bundled Hugeicons with a 1.5px stroke.
 
 ## Assumptions and current limits
 
